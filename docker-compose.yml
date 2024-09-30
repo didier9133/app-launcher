@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  nats-server:
+    image: nats:latest
+    ports:
+      - 8222:8222
+  
+  gateway:
+    build: ./gateway
+    ports:
+      - ${PORT_GATEWAY}:3001
+    volumes:
+      - ./gateway/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3001
+      - SERVERS_NATS=nats://nats-server:4222 
+
+  products:
+    build: ./product-ms
+    volumes:
+      - ./product-ms/src:/usr/src/app/src
+    command: >
+      sh -c "npx prisma migrate dev && npx prisma generate && npm run start:dev"
+    environment:
+      - PORT=3000
+      - SERVERS_NATS=nats://nats-server:4222
+      - DATABASE_URL=file:./dev.db
+      
+  orders:
+    depends_on:
+      - orders-db
+    build: ./orders-ms
+    volumes:
+      - ./orders-ms/src:/usr/src/app/src
+    command: >
+      sh -c "npx prisma migrate dev && npx prisma generate && npm run start:dev"
+    environment:
+      - DATABASE_URL=postgresql://decs:password_decs@orders-db:5432/orders?schema=public
+      - SERVERS_NATS=nats://nats-server:4222
+      - PORT=3002
+
+  orders-db:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_USER: decs
+      POSTGRES_PASSWORD: password_decs
+      POSTGRES_DB: orders
+    volumes:
+      - ./orders-ms/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    
