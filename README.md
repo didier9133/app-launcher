@@ -1,6 +1,6 @@
 ## Dev
 
-    - Clonar el repositorio
+    - Clonar el repositorio.
     - Crear un .env de acuerdo con el .env.template
     - Ejecuatr el npx prisma migrate dev de los microservicios correspondientes
     - Ejecutar el comando docker compose up --build
