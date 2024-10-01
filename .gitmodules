@@ -1,3 +1,6 @@
 [submodule "gateway"]
 	path = gateway
 	url = https://github.com/didier9133/gateway.git
+[submodule "product-ms"]
+	path = product-ms
+	url = https://github.com/didier9133/product-ms.git
