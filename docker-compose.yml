@@ -52,4 +52,19 @@ services:
       - ./orders-ms/data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  payments:
+    build: ./payments-ms
+    volumes:
+      - ./payments-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3000
+      - SERVERS_NATS=nats://nats-server:4222 
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRPE_WEBHOOK_SECRET=${STRPE_WEBHOOK_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
+    ports:
+      - 3010:3000
     
